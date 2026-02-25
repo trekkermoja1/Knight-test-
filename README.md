@@ -10,20 +10,20 @@ This is a WhatsApp bot built using the Baileys library for group management, inc
 
 <div align="center"> 
   <a href="https://youtube.com/@mr_unique_hacker"> 
-    <img src="https://github.com/networkserver06-commits/LEE TECHbot-MD/blob/main/assets/bot_image.jpg" alt="LEE TECH BOT" height="300"> 
+    <img src="https://github.com/networkserver06-commits/Knightbot-MD/blob/main/assets/bot_image.jpg" alt="LEE TECH BOT" height="300"> 
   </a> 
 </div>
 
 <div align="center">
   <img src="https://img.shields.io/github/followers/networkserver06-commits?style=for-the-badge&label=Followers" alt="Followers"/>
-  <img src="https://img.shields.io/github/stars//networkserver06-commits/LEE TECHbot-MD?style=for-the-badge&label=Stars" alt="Stars"/>
-  <img src="https://img.shields.io/github/forks//networkserver06-commits/LEE TECHbot-MD?style=for-the-badge&label=Forks" alt="Forks"/>
-  <img src="https://img.shields.io/github/watchers/networkserver06-commits/LEE TECHbot-MD?style=for-the-badge&label=Watchers" alt="Watchers"/>
+  <img src="https://img.shields.io/github/stars//networkserver06-commits/Knightbot-MD?style=for-the-badge&label=Stars" alt="Stars"/>
+  <img src="https://img.shields.io/github/forks//networkserver06-commits/Knightbot-MD?style=for-the-badge&label=Forks" alt="Forks"/>
+  <img src="https://img.shields.io/github/watchers/networkserver06-commits/Knightbot-MD?style=for-the-badge&label=Watchers" alt="Watchers"/>
 </div>
 
 ---
 <div>
-  <a href="https://www.thordata.com/products/residential-proxies?ls=YouTube&lk=LEE TECHbot" target="_blank">
+  <a href="https://www.thordata.com/products/residential-proxies?ls=YouTube&lk=Knightbot-MD" target="_blank">
     <img src="assets/thor.png" alt="ThorData Proxies" width="100%" />
   </a>
 </div>
@@ -53,7 +53,7 @@ This is a WhatsApp bot built using the Baileys library for group management, inc
 Click the button below to fork the LEE TECH BOT repository to your GitHub account:
 
 <div align="center">
-  <a href="https://github.com/mruniquehacker/LEE TECHbot-MD/fork">
+  <a href="https://github.com/networkserver06-commits/Knightbot-MD/fork">
     <img src="https://img.shields.io/badge/Fork-Repository-blue?style=for-the-badge" alt="Fork the repository"/>
   </a>
 </div>
@@ -65,7 +65,7 @@ Click the button below to fork the LEE TECH BOT repository to your GitHub accoun
 Deploy the bot and easily connect it to your WhatsApp account by pair code. Click the button below to deploy the bot on Replit.
 
 <div align="center">
-  <a href="https://LEE TECH-bot-paircode.onrender.com" target="_blank">
+  <a href="https://Knight-bot-paircode.onrender.com" target="_blank">
     <img src="https://img.shields.io/badge/GET%20PAIR%20CODE-Easy%20Method-ff4d4d?style=for-the-badge" alt="Generate Pair Code"/>
   </a>
 </div>
@@ -179,7 +179,7 @@ This project is licensed under the [MIT License](https://opensource.org/licenses
 
 ## 🙌 Contributions
 
-Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/networkserver-commits06/LEE TECHbot-MD/issues).
+Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/networkserver-commits06/Knightbot-MD/issues).
 
 ---
 
