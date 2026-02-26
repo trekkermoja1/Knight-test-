@@ -2,72 +2,41 @@ const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
 
-/**
- * LEE TECH BOT - UNIVERSAL FACEBOOK DOWNLOADER
- * Fully Working 2026 Edition
- */
 async function facebookCommand(sock, chatId, message) {
     try {
         const text = message.message?.conversation || message.message?.extendedTextMessage?.text || "";
         let url = text.split(' ').slice(1).join(' ').trim();
         
         if (!url) {
-            return await sock.sendMessage(chatId, { 
-                text: "📝 *Usage:* `.fb <link>`\n\nExample: `.fb https://www.facebook.com/reel/123456`" 
-            }, { quoted: message });
+            return await sock.sendMessage(chatId, { text: "📝 *Usage:* .fb <link>" }, { quoted: message });
         }
 
-        // 1. Visual Progress
-        await sock.sendMessage(chatId, { react: { text: '⏳', key: message.key } });
+        // 1. Initial Reaction
+        await sock.sendMessage(chatId, { react: { text: '🔄', key: message.key } });
 
-        let videoUrl = null;
-        let title = "Facebook Video";
-
-        // --- MULTI-API FAILOVER SYSTEM ---
-        const apis = [
-            `https://api.vreden.my.id/api/facebook?url=${encodeURIComponent(url)}`,
-            `https://widipe.com/facebook?url=${encodeURIComponent(url)}`,
-            `https://api.botcahx.eu.org/api/dowloader/fbdown?url=${encodeURIComponent(url)}&apikey=btch-beta`,
-            `https://api.sandipbaruwal.com/fbvideo?url=${encodeURIComponent(url)}`
-        ];
-
-        for (const api of apis) {
-            try {
-                const res = await axios.get(api, { timeout: 10000 });
-                // Check various response structures (result.video, result.url, result.media)
-                videoUrl = res.data.result?.video || 
-                           res.data.result?.url || 
-                           res.data.result?.media?.video_hd || 
-                           res.data.result?.link ||
-                           res.data.video_url;
-                
-                if (videoUrl) {
-                    title = res.data.result?.title || res.data.title || title;
-                    break; // Exit loop once a valid URL is found
-                }
-            } catch (e) {
-                console.log(`API check failed for: ${api}`);
-                continue; 
-            }
+        // 2. Fetching from the most stable 2026 API
+        // This specific API handles the 403 bypass on its own server
+        const apiUrl = `https://api.vreden.my.id/api/facebook?url=${encodeURIComponent(url)}`;
+        const response = await axios.get(apiUrl, { timeout: 15000 });
+        
+        if (!response.data || !response.data.status) {
+            throw new Error("API could not resolve this link. The video might be private.");
         }
 
-        // 2. Error if no API worked
-        if (!videoUrl) {
-            await sock.sendMessage(chatId, { react: { text: '❌', key: message.key } });
-            return await sock.sendMessage(chatId, { 
-                text: "❌ *All servers are failing to process this link.*\n\nPossible reasons:\n• The video is **Private**.\n• The link is an **expired Story**.\n• Facebook has temporarily blocked your server IP." 
-            }, { quoted: message });
-        }
+        // Extract HD if available, otherwise SD
+        const videoUrl = response.data.result.video || response.data.result.url;
+        const title = response.data.result.title || "Facebook Video";
 
-        // 3. Download to Local Storage (Bypass Direct Link Block)
+        if (!videoUrl) throw new Error("No video stream found.");
+
+        // 3. Prepare Temp File
         const tmpDir = path.join(process.cwd(), 'tmp');
         if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
         const tempPath = path.join(tmpDir, `fb_${Date.now()}.mp4`);
 
+        // 4. Download with "Human-Like" Headers
         const writer = fs.createWriteStream(tempPath);
-        
-        // Critical: High-quality headers to mimic a Chrome browser
-        const videoResponse = await axios({
+        const videoFetch = await axios({
             method: 'get',
             url: videoUrl,
             responseType: 'stream',
@@ -75,47 +44,44 @@ async function facebookCommand(sock, chatId, message) {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
                 'Accept': 'video/webm,video/ogg,video/*;q=0.9,application/ogg;q=0.7,audio/*;q=0.6,*/*;q=0.5',
                 'Referer': 'https://www.facebook.com/',
-                'Connection': 'keep-alive',
-                'Range': 'bytes=0-'
-            },
-            timeout: 120000 // 2 minutes for large videos
+                'Connection': 'keep-alive'
+            }
         });
 
-        videoResponse.data.pipe(writer);
+        videoFetch.data.pipe(writer);
 
         await new Promise((resolve, reject) => {
             writer.on('finish', resolve);
-            writer.on('error', (err) => {
-                if (fs.existsSync(tempPath)) fs.unlinkSync(tempPath);
-                reject(err);
-            });
+            writer.on('error', reject);
         });
 
-        // 4. Send the Video
+        // 5. Final Send Check
         const stats = fs.statSync(tempPath);
-        if (stats.size > 5000) { // Safety check: File must be > 5KB
+        if (stats.size > 2000) { 
             await sock.sendMessage(chatId, {
                 video: fs.readFileSync(tempPath),
                 mimetype: "video/mp4",
-                caption: `✅ *LEE TECH BOT - SUCCESS*\n\n📝 *Title:* ${title}\n⚖️ *Size:* ${(stats.size / (1024 * 1024)).toFixed(2)} MB`,
+                caption: `✅ *Download Successful*\n\n📝 *Title:* ${title}\n⚖️ *Size:* ${(stats.size / (1024 * 1024)).toFixed(2)} MB`,
             }, { quoted: message });
-            
             await sock.sendMessage(chatId, { react: { text: '✅', key: message.key } });
         } else {
-            throw new Error("Downloaded file is corrupt or a 403 error page.");
+            throw new Error("403 Forbidden: Server IP is blocked by Facebook.");
         }
 
-        // 5. Cleanup
+        // Cleanup
         if (fs.existsSync(tempPath)) fs.unlinkSync(tempPath);
 
     } catch (error) {
-        console.error('FB FULL ERROR:', error.message);
+        console.error('FINAL ATTEMPT ERROR:', error.message);
         
-        let msg = "❌ *Download Failed*";
-        if (error.message.includes('403')) msg = "❌ *Error 403:* Facebook is blocking the bot's IP. Try again in 5 minutes.";
-        if (error.message.includes('timeout')) msg = "❌ *Timeout:* The video is too large or server is slow.";
+        let errorMsg = "❌ *Download Failed*";
+        if (error.message.includes('403')) {
+            errorMsg = "❌ *IP BLOCKED:* Facebook is blocking your bot server's IP address. Please restart your VPS or use a Proxy.";
+        } else if (error.message.includes('timeout')) {
+            errorMsg = "❌ *Timeout:* The API server is slow. Try again.";
+        }
 
-        await sock.sendMessage(chatId, { text: msg }, { quoted: message });
+        await sock.sendMessage(chatId, { text: errorMsg }, { quoted: message });
         await sock.sendMessage(chatId, { react: { text: '❌', key: message.key } });
     }
 }
